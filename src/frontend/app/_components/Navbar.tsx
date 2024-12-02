@@ -2,9 +2,9 @@ import React from "react";
 
 const Navbar = () => {
   return (
-    <div className="relative w-full h-12 flex items-center justify-between px-6">
-      <p className="text-white font-bold">Audio Search</p>
-      <button className="rounded-full text-white px-4 py-1 transition-colors duration-300 hover:bg-white hover:text-stone-900">
+    <div className="sticky top-0 w-full h-16 flex items-center justify-between px-8 z-10 bg-transparent">
+      <p className="text-white font-extrabold font-inter text-xl">Audio Search</p>
+      <button className="rounded-full font-extrabold font-inter text-white px-4 py-1 text-l transition-colors duration-300 hover:bg-white hover:text-black">
         About Us
       </button>
     </div>
