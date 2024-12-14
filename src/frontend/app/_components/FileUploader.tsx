@@ -37,7 +37,7 @@ const FileUploader: React.FC = () => {
           <input
             type="file"
             id="audio-file"
-            accept=".wav"
+            accept=".wav .zip"
             onChange={handleAudioFileChange}
             className="w-full text-sm text-gray-500 
               file:mr-2 file:py-2 file:px-4 
@@ -67,7 +67,7 @@ const FileUploader: React.FC = () => {
           <input
             type="file"
             id="pictures-file"
-            accept=".jpg, .png"
+            accept=".jpg, .png .zip"
             onChange={handlePicturesFileChange}
             className="w-full text-sm text-gray-500 
               file:mr-2 file:py-2 file:px-4 

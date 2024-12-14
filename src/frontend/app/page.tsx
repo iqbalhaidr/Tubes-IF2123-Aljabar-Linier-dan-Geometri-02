@@ -5,6 +5,7 @@ import Pagination from '@/app/_components/Pagination';
 import { useState, useRef } from 'react';
 import FileUploader from "./_components/FileUploader";
 import Album from "./_components/Album";
+import Music from "./_components/Music";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,6 +53,7 @@ export default function Home() {
         </div>
       </div>
       <Album />
+      <Music />
     </div>
   );
 }
