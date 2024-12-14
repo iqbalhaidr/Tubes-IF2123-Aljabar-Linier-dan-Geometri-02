@@ -52,8 +52,11 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <Album />
-      <Music />
+      <div className="">
+        <Album />
+      </div>
+
+      
     </div>
   );
 }

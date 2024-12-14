@@ -80,7 +80,9 @@ const Music: React.FC = () => {
                     </div>
                     <FileUploader />
                 </div>
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                <div className="mx-auto py-10">
+                    <Pagination />
+                </div>
             </div>
         </div>
     );
