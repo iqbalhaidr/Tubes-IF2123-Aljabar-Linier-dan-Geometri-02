@@ -3,6 +3,8 @@ import Image from "next/image";
 import Navbar from "@/app/_components/Navbar";
 import Pagination from '@/app/_components/Pagination'; 
 import { useState, useRef } from 'react';
+import FileUploader from "./_components/FileUploader";
+import Album from "./_components/Album";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,31 +51,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="relative h-screen" ref={secondPageRef}>
-        <div className="flex space-y-9 bg-blue-950 h-full">
-          <div className="flex flex-col bg-white w-1/5 my-20 h-auto rounded-lg shadow-lg">
-            <div className="bg-fixed m-4 w-auto h-36 bg-transparent rounded-lg flex items-center justify-center overflow-hidden"> 
-              {imageUrl && ( 
-                <Image src={imageUrl} alt="Uploaded image" width={300} height={300} className="object-contain" /> 
-              )}
-            </div>       
-            {fileName && (
-              <div className="text-center mb-2 text-sm text-gray-700">{fileName}</div>
-            )}
-            
-            <input 
-              type="file" 
-              accept="image/*" 
-              id="image" 
-              className="mt-2 block w-full text-sm text-gray-500 file:mr-2 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100" 
-              onChange={handleImageUpload} // Tambahkan event handler untuk upload gambar
-            />
-
-
-          </div>
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-        </div>
-      </div>
+      <Album />
     </div>
   );
 }
