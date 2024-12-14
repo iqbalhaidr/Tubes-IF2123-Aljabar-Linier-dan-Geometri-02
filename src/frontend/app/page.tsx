@@ -6,6 +6,7 @@ import { useState, useRef } from 'react';
 import FileUploader from "./_components/FileUploader";
 import Album from "./_components/Album";
 import Music from "./_components/Music";
+import ToggleComponents from "./_components/ToggleComponents";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,10 +53,8 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="">
-        <Album />
-      </div>
-
+      
+      <ToggleComponents />
       
     </div>
   );

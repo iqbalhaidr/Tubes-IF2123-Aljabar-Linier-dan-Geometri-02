@@ -4,6 +4,7 @@ import Navbar from "@/app/_components/Navbar";
 import Pagination from '@/app/_components/Pagination'; 
 import { useState, useRef } from 'react';
 import FileUploader from "@/app/_components/FileUploader";
+import ToggleComponents from "@/app/_components/ToggleComponents";
 
 const Album: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,6 +48,7 @@ const Album: React.FC = () => {
 
     return (
         <div className="relative h-screen" ref={secondPageRef}>
+            <ToggleComponents />
             <div className="flex space-y-9 bg-blue-950 h-full">
                 <div className="flex flex-col bg-white w-1/5 my-20 h-auto rounded-lg shadow-lg ">
                     <div className='py-4 w-full'>
