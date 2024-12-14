@@ -1,5 +1,5 @@
 import numpy as np
-#from PIL import Image
+from PIL import Image
 from mido import MidiFile
 import json
 import os
@@ -422,25 +422,25 @@ def musicRetrievalDataset(datasetPath, filePath, resultPath):
 
 # ========================= MUSIC INFORMATION RETRIEVAL ======================
 
-# CONTOH MENJALANKAN PROGRAM
-filePath = "../../test/midi_dataset/sampleAPT3.mid"
-folderPath = "../../test/midi_dataset/"
-datasetPath = "../../test/adataset2.json"
-resultPath = "../../test/adresult1.json"
+# # CONTOH MENJALANKAN PROGRAM
+# filePath = "../../test/midi_dataset/sampleAPT3.mid"
+# folderPath = "../../test/midi_dataset/"
+# datasetPath = "../../test/adataset2.json"
+# resultPath = "../../test/adresult1.json"
 
 #makeDataset(folderPath, datasetPath)
-musicRetrieval(folderPath, filePath, resultPath)
+# musicRetrieval(folderPath, filePath, resultPath)
 #musicRetrievalDataset(datasetPath, filePath, resultPath)
 
 
 # Image Processing and Loading
-def preprocess_images(image_dir, target_size=(100, 100)):
+def preprocess_folder(folder_path, target_size=(100, 100)):
     image_vectors = []
     image_paths = []
-    
-    for filename in os.listdir(image_dir):
-        if filename.endswith(('.png', '.jpg', '.jpeg')):
-            filepath = os.path.join(image_dir, filename)
+
+    for filename in os.listdir(folder_path):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            filepath = os.path.join(folder_path, filename)
             image_paths.append(filepath)
 
             # Open image and process
@@ -454,8 +454,27 @@ def preprocess_images(image_dir, target_size=(100, 100)):
 
             # Flatten and add to the list
             image_vectors.append(grayscale.flatten())
-    
+
     return np.array(image_vectors), image_paths
+
+
+def preprocess_file(file_path, target_size=(100, 100)):
+    if not file_path.lower().endswith(('.png', '.jpg', '.jpeg')):
+        raise ValueError(f"Unsupported file type: {file_path}")
+
+    # Open image and process
+    img = Image.open(file_path).convert('RGB')
+    img_resized = img.resize(target_size)
+    
+    # Convert to grayscale
+    img_array = np.array(img_resized)
+    R, G, B = img_array[:, :, 0], img_array[:, :, 1], img_array[:, :, 2]
+    grayscale = 0.2989 * R + 0.5870 * G + 0.1140 * B
+
+    # Flatten the image
+    image_vector = grayscale.flatten()
+
+    return image_vector
 
 # Data Centering
 def standardize_data(data):
@@ -475,9 +494,71 @@ def find_similar_images(query_image, dataset, eigenvectors, mean_vector, top_k=5
     query_standardized = query_image - mean_vector
     query_projection = query_standardized @ eigenvectors
 
-    # Compute Euclidean distances
+
     distances = np.linalg.norm(dataset - query_projection, axis=1)
     sorted_indices = np.argsort(distances)[:top_k]
     sorted_results = [(idx, distances[idx]) for idx in sorted_indices]
 
     return sorted_results
+
+
+def ImageRetrieval(folder_path, filePath, resultPath, target_size=(100, 100), top_k=5, n_components=50):
+    # Measure start time for folder preprocessing
+    start = time.time()
+    dataset_vectors, dataset_paths = preprocess_folder(folder_path, target_size=target_size)
+    end = time.time()
+    folder_preprocessing_time = round((end - start) * 10**3, 2)  # in milliseconds
+
+    # Standardize the dataset
+    standardized_data, mean_vector = standardize_data(dataset_vectors)
+
+    # Perform PCA on the dataset
+    projected_data, eigenvectors, _ = compute_pca(standardized_data, n_components=n_components)
+
+    # Measure start time for file preprocessing
+    start = time.time()
+    query_vector = preprocess_file(filePath, target_size=target_size)
+    end = time.time()
+    file_preprocessing_time = round((end - start) * 10**3, 2)  # in milliseconds
+
+    # Measure start time for similarity computation
+    start = time.time()
+    similar_images = find_similar_images(query_vector, projected_data, eigenvectors, mean_vector, top_k=top_k)
+    end = time.time()
+    similarity_search_time = round((end - start) * 10**3, 2)  # in milliseconds
+
+    # Total execution time
+    total_execution_time = folder_preprocessing_time + file_preprocessing_time + similarity_search_time
+
+    # Prepare the results
+    query_file_name = os.path.basename(filePath)
+    result = {
+        "Query Image": query_file_name,
+        "Top Matches": [
+            {
+                "Rank": i + 1,
+                "Image Path": dataset_paths[match[0]],
+                "Distance": round(match[1], 2),
+            }
+            for i, match in enumerate(similar_images)
+        ],
+        "Execution Times": {
+            "Folder Preprocessing Time (ms)": folder_preprocessing_time,
+            "File Preprocessing Time (ms)": file_preprocessing_time,
+            "Similarity Search Time (ms)": similarity_search_time,
+            "Total Execution Time (ms)": total_execution_time,
+        },
+    }
+
+    # Print the results to the console
+    print(f"\nQuery Image: {query_file_name}\n")
+    for rank, match in enumerate(result["Top Matches"], start=1):
+        print(f"{rank}. {match['Image Path']} (Distance: {match['Distance']})")
+    print(f"\nFolder Preprocessing Time: {folder_preprocessing_time} ms")
+    print(f"File Preprocessing Time: {file_preprocessing_time} ms")
+    print(f"Similarity Search Time: {similarity_search_time} ms")
+    print(f"Total Execution Time: {total_execution_time} ms")
+
+    # Save the results to the specified file
+    with open(resultPath, "w") as f:
+        json.dump(result, f, indent=4)

@@ -1,0 +1,36 @@
+{
+    "Query Image": "Screenshot (12).png",
+    "Top Matches": [
+        {
+            "Rank": 1,
+            "Image Path": "C:\\Users\\Gerrard\\OneDrive\\Pictures\\random_data\\Screenshot (12).png",
+            "Distance": 0.0
+        },
+        {
+            "Rank": 2,
+            "Image Path": "C:\\Users\\Gerrard\\OneDrive\\Pictures\\random_data\\Screenshot (9).png",
+            "Distance": 3900.57
+        },
+        {
+            "Rank": 3,
+            "Image Path": "C:\\Users\\Gerrard\\OneDrive\\Pictures\\random_data\\Screenshot 2024-01-11 171102.png",
+            "Distance": 4156.75
+        },
+        {
+            "Rank": 4,
+            "Image Path": "C:\\Users\\Gerrard\\OneDrive\\Pictures\\random_data\\Screenshot 2024-01-12 131616.png",
+            "Distance": 4231.35
+        },
+        {
+            "Rank": 5,
+            "Image Path": "C:\\Users\\Gerrard\\OneDrive\\Pictures\\random_data\\Screenshot 2024-01-17 143355.png",
+            "Distance": 4273.92
+        }
+    ],
+    "Execution Times": {
+        "Folder Preprocessing Time (ms)": 933.41,
+        "File Preprocessing Time (ms)": 39.52,
+        "Similarity Search Time (ms)": 0.32,
+        "Total Execution Time (ms)": 973.25
+    }
+}
