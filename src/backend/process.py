@@ -601,7 +601,7 @@ def ImageRetrieval(folder_path, filePath, resultPath, target_size=(100, 100), to
                 "file": file_name,
                 "sim": sim,
             })
-    result.append({"execution": executionTime})
+    result.append({"execution": total_execution_time})
 
 
     with open(resultPath, "w") as f:
