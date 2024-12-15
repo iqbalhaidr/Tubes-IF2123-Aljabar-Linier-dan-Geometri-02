@@ -112,7 +112,7 @@ const ResultPagination: React.FC = () => {
       {/* Render execution time */}
       {executionTime !== null && (
         <div className="mt-4 text-center text-white">
-          <p>Execution time: {executionTime.toFixed(2)} ms</p>
+          <p>Execution time: {executionTime} ms</p>
         </div>
       )}
 

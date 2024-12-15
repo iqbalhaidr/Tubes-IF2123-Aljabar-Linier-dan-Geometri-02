@@ -4,7 +4,7 @@ import Navbar from "@/app/_components/Navbar";
 import Pagination from '@/app/_components/Pagination'; 
 import { useState, useRef } from 'react'; 
 import FileUploader from "@/app/_components/FileUploader";
-import ResultPagination from "./ResultPagination";
+import ResultPagination from "@/app/_components/ResultPagination";
 
 const Album: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
