@@ -35,6 +35,18 @@ const Album: React.FC = () => {
       }
     };
 
+    const handleSearchImage = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/search_image/', {
+          method: 'POST',
+        });
+    
+      } catch (error) {
+        console.error('Search error:', error);
+        alert('An error occurred while searching');
+      }
+    };
+
     const handleUploadImage = async (file: File | null) => {
       if (!file) return alert('No file selected');
 
@@ -97,7 +109,8 @@ const Album: React.FC = () => {
                     <FileUploader />
                     <div className='py-4 w-full'>
                       <div className='flex flex-col items-center justify-center space-x-2'> 
-                        <button 
+                        <button
+                          onClick={handleSearchImage} 
                           className='px-4 py-1 bg-green-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'
                         >
                           Search

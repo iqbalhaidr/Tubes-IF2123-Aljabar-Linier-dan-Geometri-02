@@ -19,6 +19,18 @@ const Music: React.FC = () => {
     }
   };
 
+  const handleSearchAudio = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/search_audio/', {
+        method: 'POST',
+      });
+  
+    } catch (error) {
+      console.error('Search error:', error);
+      alert('An error occurred while searching');
+    }
+  };
+
   const handleUploadAudio = async (file: File | null) => {
     if (!file) return alert('No file selected');
 
@@ -67,7 +79,8 @@ const Music: React.FC = () => {
           <FileUploader />
           <div className='py-4 w-full'>
             <div className='flex flex-col items-center justify-center space-x-2'> 
-              <button 
+              <button
+                onClick={handleSearchAudio}
                 className='px-4 py-1 bg-green-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'
               >
                 Search

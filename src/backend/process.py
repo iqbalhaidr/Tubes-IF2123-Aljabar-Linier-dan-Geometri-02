@@ -11,9 +11,11 @@ import time
 # { Mengembalikan list pesan midi note_on/note_off pada track channel melodi
 #   utama serta menambahkan absolute time setiap pesan }
 def loadMidi(filePath):
+    print("midifile")
     midi = MidiFile(filePath)
-
+    print(midi)
     dataIdx = findTrackChannel(filePath)
+    print("done dataidx")
     trackIdx = dataIdx['track']
     channelIdx = dataIdx['channel']
     
@@ -142,13 +144,20 @@ def extractFTB(windows):
 # { Mengembalikan dict <nama, fiturATB, fiturRTB, fiturFTB> sebuah file/lagu }
 # TODO: [OPTIMASI] MULTITHREADING
 def extractFile(filePath):
+    print(filePath)
     fileName = os.path.basename(filePath)
-
+    print(fileName)
+    print("pesan")
     pesan = loadMidi(filePath)
+    print("tpb")
     tpb = getTicksPerBeat(filePath)
+    print("windows")
     windows = makeWindows(pesan, tpb)
+    print("atb")
     atb = extractATB(windows)
+    print("rtb")
     rtb = extractRTB(windows)
+    print("ftb")
     ftb = extractFTB(windows)
     return {
         'name': fileName,
@@ -162,13 +171,15 @@ def extractFile(filePath):
 #   file/lagu }
 def extractFolder(folderPath):
     midiFiles = []
+    print("Cek midi say")
     for fileName in os.listdir(folderPath):
         if fileName.endswith(".mid"):
             midiFiles.append(fileName)
     
+    print("Extract song say")
     dataset = []
     for fileName in midiFiles:
-        song = extractFile(folderPath + fileName)
+        song = extractFile("./datasetaudio/" + fileName)
         dataset.append(song)
 
     return dataset
@@ -285,6 +296,7 @@ def loadDataset(datasetPath):
 # { Prekondisi: filePath terdefinisi }
 # { Mengembalikan dict berisi data track, channel melodi utama }
 def findTrackChannel(filePath):
+    print("findtrack")
     midi = MidiFile(filePath)
     trackInfo = []
 
@@ -354,35 +366,39 @@ def makeDataset(folderPath, datasetPath):
 #        index ke 11 berisi nama file query }
 # NOTE: INI MERUPAKAN FUNGSI GABUNGAN MENJALANKAN MUSIC RETRIEVAL
 def musicRetrieval(folderPath, filePath, resultPath):
+    print("Mulai extract folder...")
     start = time.time()
     dataset = extractFolder(folderPath)
     end = time.time()
     extractTime = (end-start) * 10**3
     extractTime = round(extractTime, 2)
 
+    print("Mulai extract file")
     song = extractFile(filePath)
 
+    print("Mulai prediksi")
     start = time.time()
     prediction = predictSong(song, dataset)
     end = time.time()
     searchTime = (end-start) * 10**3
     searchTime = round(searchTime, 2)
 
+    print("Mulai append")
     executionTime = extractTime + searchTime
     fileName = os.path.basename(filePath)
     result = []
-    print(f"\nQuery Song: {fileName}\n")
-    for i in range (10):
-        print(f"{i+1}. {prediction[i]['name']} {prediction[i]['sim']}%")
-        result.append(prediction[i])
-    print(f"\nExtract Time: {extractTime} ms")
-    print(f"Search Time: {searchTime} ms")
-    print(f"Total Execution Time: {executionTime} ms")
-    result.append(executionTime)
-    result.append(fileName)
-
-    with open(resultPath, "w") as f:
-        json.dump(result, f)
+    i = 0
+    for info in prediction:
+        if (info['sim'] > 55):
+            print(f"{i+1}. {info['name']} {info['sim']}%")
+            result.append(info)
+            i += 1
+    result.append({"execution": executionTime})
+    if result:
+        with open(resultPath, "w") as f:
+            json.dump(result, f)
+    else:
+        print("apalah")
 
 # { I.S. datasetPath, filePath terdefinisi. file dataset dibuat dari 
 #        fungsi makeDataset 
@@ -407,15 +423,13 @@ def musicRetrievalDataset(datasetPath, filePath, resultPath):
     executionTime = loadTime + searchTime
     fileName = os.path.basename(filePath)
     result = []
-    print(f"\nQuery Song: {fileName}\n")
-    for i in range (10):
-        print(f"{i+1}. {prediction[i]['name']} {prediction[i]['sim']}%")
-        result.append(prediction[i])
-    print(f"\nLoad Time: {loadTime} ms")
-    print(f"Search Time: {searchTime} ms")
-    print(f"Total Execution Time: {executionTime} ms")
-    result.append(executionTime)
-    result.append(fileName)
+    i = 0
+    for info in prediction:
+        if (info['sim'] > 55):
+            print(f"{i+1}. {info['name']} {info['sim']}%")
+            result.append(info)
+            i += 1
+    result.append({"execution": executionTime})
 
     with open(resultPath, "w") as f:
         json.dump(result, f)
@@ -490,75 +504,71 @@ def compute_pca(data, n_components):
     return projected_data, eigenvectors, S[:n_components]
 
 # Similarity Computation
-def find_similar_images(query_image, dataset, eigenvectors, mean_vector, top_k=5):
+def find_similar_images(query_image, dataset, eigenvectors, mean_vector, top_k=10):
     query_standardized = query_image - mean_vector
     query_projection = query_standardized @ eigenvectors
 
 
     distances = np.linalg.norm(dataset - query_projection, axis=1)
+    d_min, d_max = np.min(distances), np.max(distances)
+
+    if d_max != d_min:
+        distances_percent = (distances - d_min) / (d_max - d_min) * 100
+    else:
+        distances_percent = np.zeros_like(distances)
+    
+    sim = 100 - distances_percent
+
     sorted_indices = np.argsort(distances)[:top_k]
-    sorted_results = [(idx, distances[idx]) for idx in sorted_indices]
+    sorted_results = [(idx, sim[idx]) for idx in sorted_indices]
 
     return sorted_results
 
 
 def ImageRetrieval(folder_path, filePath, resultPath, target_size=(100, 100), top_k=5, n_components=50):
-    # Measure start time for folder preprocessing
+    print("Mulai dataset")
     start = time.time()
     dataset_vectors, dataset_paths = preprocess_folder(folder_path, target_size=target_size)
     end = time.time()
     folder_preprocessing_time = round((end - start) * 10**3, 2)  # in milliseconds
 
-    # Standardize the dataset
+    print("Standarisasi Dataset")
     standardized_data, mean_vector = standardize_data(dataset_vectors)
 
-    # Perform PCA on the dataset
+    print("SVD DATASET")
     projected_data, eigenvectors, _ = compute_pca(standardized_data, n_components=n_components)
 
-    # Measure start time for file preprocessing
+    print("Proses Query")
     start = time.time()
     query_vector = preprocess_file(filePath, target_size=target_size)
     end = time.time()
     file_preprocessing_time = round((end - start) * 10**3, 2)  # in milliseconds
 
-    # Measure start time for similarity computation
+    print("Cari Similiar")
     start = time.time()
     similar_images = find_similar_images(query_vector, projected_data, eigenvectors, mean_vector, top_k=top_k)
     end = time.time()
     similarity_search_time = round((end - start) * 10**3, 2)  # in milliseconds
+    print("Similar Images:", similar_images)
 
-    # Total execution time
     total_execution_time = folder_preprocessing_time + file_preprocessing_time + similarity_search_time
+    total_execution_time = round(total_execution_time, 2)
 
-    # Prepare the results
     query_file_name = os.path.basename(filePath)
-    result = {
-        "Query Image": query_file_name,
-        "Top Matches": [
-            {
-                "Rank": i + 1,
-                "Image Path": dataset_paths[match[0]],
-                "Distance": round(match[1], 2),
-            }
-            for i, match in enumerate(similar_images)
-        ],
-        "Execution Times": {
-            "Folder Preprocessing Time (ms)": folder_preprocessing_time,
-            "File Preprocessing Time (ms)": file_preprocessing_time,
-            "Similarity Search Time (ms)": similarity_search_time,
-            "Total Execution Time (ms)": total_execution_time,
-        },
-    }
+    print("Isi Result")
+    result = []  # Initialize an empty list
 
-    # Print the results to the console
-    print(f"\nQuery Image: {query_file_name}\n")
-    for rank, match in enumerate(result["Top Matches"], start=1):
-        print(f"{rank}. {match['Image Path']} (Distance: {match['Distance']})")
-    print(f"\nFolder Preprocessing Time: {folder_preprocessing_time} ms")
-    print(f"File Preprocessing Time: {file_preprocessing_time} ms")
-    print(f"Similarity Search Time: {similarity_search_time} ms")
-    print(f"Total Execution Time: {total_execution_time} ms")
+    for idx, sim in similar_images:
+        sim = float(sim)
+        if sim > 55:
+            file_name = os.path.basename(dataset_paths[idx]) 
+            result.append({
+                "file": file_name,
+                "sim": sim,
+            })
+    result.append({"execution": executionTime})
 
-    # Save the results to the specified file
+
     with open(resultPath, "w") as f:
-        json.dump(result, f, indent=4)
+        json.dump(result, f)
+    print("Selesai json")
