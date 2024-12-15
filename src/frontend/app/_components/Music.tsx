@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import FileUploader from "@/app/_components/FileUploader";
 import Pagination from "@/app/_components/Pagination";
+import ResultPagination from "@/app/_components/ResultPagination";
 
 const Music: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [useResultPagination, setUseResultPagination] = useState(false); // State to toggle pagination component
   const totalPages = 3; // Jumlah total halaman
   const [audioFile, setAudioFile] = useState<File | null>(null);
 
@@ -24,7 +26,12 @@ const Music: React.FC = () => {
       const response = await fetch('http://127.0.0.1:8000/search_audio/', {
         method: 'POST',
       });
-  
+
+      if (response.ok) {
+        setUseResultPagination(true); // Switch to ResultPagination
+      } else {
+        throw new Error('Failed to fetch search results.');
+      }
     } catch (error) {
       console.error('Search error:', error);
       alert('An error occurred while searching');
@@ -34,16 +41,15 @@ const Music: React.FC = () => {
   const handleUploadAudio = async (file: File | null) => {
     if (!file) return alert('No file selected');
 
-  
     const formData = new FormData();
     formData.append('file', file);
-  
+
     try {
       const response = await fetch('http://127.0.0.1:8000/upload_audio/', {
         method: 'POST',
         body: formData,
       });
-  
+
       const data = await response.json();
       if (response.ok) {
         alert(data.message || 'Upload successful!');
@@ -90,7 +96,7 @@ const Music: React.FC = () => {
         </div>
 
         <div className="ml-2 justify-center w-full bg-blue-950">
-          <Pagination />
+          {useResultPagination ? <ResultPagination /> : <Pagination />}
         </div>
       </div>
     </div>
