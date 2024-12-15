@@ -1,44 +1,20 @@
 'use client'
-import Image from "next/image";
+
+import { useState } from 'react';
 import Navbar from "@/app/_components/Navbar";
-import Pagination from '@/app/_components/Pagination'; 
-import { useState, useRef } from 'react';
-import FileUploader from "./_components/FileUploader";
-import Album from "./_components/Album";
-import Music from "./_components/Music";
+import Album from "@/app/_components/Album";
+import Music from "@/app/_components/Music";
 import ToggleComponents from "./_components/ToggleComponents";
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 3; // Jumlah total halaman
-  const [imageUrl, setImageUrl] = useState<string | null>(null); // State untuk menyimpan URL gambar yang diunggah
-  const [fileName, setFileName] = useState<string | null>(null); // State untuk menyimpan nama file yang diunggah
-  
-  interface PaginationProps {
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-  }
+  const [activeComponent, setActiveComponent] = useState<'Album' | 'Music'>('Album');
 
-  const secondPageRef = useRef<HTMLDivElement | null>(null);
-
-  const handlePageChange = (page: number): void => {
-    setCurrentPage(page);
+  const handleShowAlbum = () => {
+    setActiveComponent('Album');
   };
 
-  const scrollToSection = () => { 
-    if (secondPageRef.current) { 
-      secondPageRef.current.scrollIntoView({ behavior: 'smooth' }); 
-    } 
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
-      setFileName(file.name); // Atur nama file
-    }
+  const handleShowMusic = () => {
+    setActiveComponent('Music');
   };
 
   return (
@@ -49,14 +25,27 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center h-full bg-transparent">
             <p className="w-1/3 text-6xl font-extrabold text-white font-montserrat text-center py-6">Find Your Music Match</p>
             <p className="w-1/2 text-l font-bold text-white font-sans text-center">Discover songs by humming or uploading artist images. Seamlessly search for album covers that match your audio dataset. Experience music like never before.</p>
-            <button className="rounded-full font-extrabold text-l font-inter text-white px-4 py-1 transition-colors duration-300 bg-[#D16C34] hover:bg-white hover:text-black mt-4" onClick={scrollToSection }>Find Your Song</button>
+            <button className="rounded-full font-extrabold text-l font-inter text-white px-4 py-1 transition-colors duration-300 bg-[#D16C34] hover:bg-white hover:text-black mt-4">
+              Find Your Song
+            </button>
           </div>
         </div>
       </div>
-      
-      <ToggleComponents />
-      
+
+      {/* Konten utama untuk Album dan Music */}
+      <div className="w-full h-screen relative">
+        {/* Tombol Toggle yang selalu berada di atas */}
+        <div className="absolute mt-14 right-1/4  transform -translate-x-1/2 z-50 bg-transparent p-4 rounded-lg">
+          <ToggleComponents 
+            activeComponent={activeComponent}
+            onShowAlbum={handleShowAlbum}
+            onShowMusic={handleShowMusic}
+          />
+        </div>
+
+        {activeComponent === 'Album' && <Album />}
+        {activeComponent === 'Music' && <Music />}
+      </div>
     </div>
   );
 }
-

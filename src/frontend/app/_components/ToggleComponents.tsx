@@ -1,37 +1,31 @@
-import React, { useState } from 'react';
-import Album from '@/app/_components/Album'; // Mengimpor komponen Album
-import Music from '@/app/_components/Music'; // Mengimpor komponen Music
+// _components/ToggleComponents.tsx
+import React from 'react';
 
-const ToggleComponents: React.FC = () => {
-  const [activeComponent, setActiveComponent] = useState<'Album' | 'Music'>('Album');
+interface ToggleComponentsProps {
+  activeComponent: 'Album' | 'Music'; // Terima activeComponent dan fungsi untuk mengganti
+  onShowAlbum: () => void;
+  onShowMusic: () => void;
+}
 
-  const handleShowAlbum = () => setActiveComponent('Album');
-  const handleShowMusic = () => setActiveComponent('Music');
-
+const ToggleComponents: React.FC<ToggleComponentsProps> = ({ activeComponent, onShowAlbum, onShowMusic }) => {
   return (
-    <div className="flex flex-col items-center">
-      <div className="space-x-4 mb-4">
-        <button
-          onClick={handleShowAlbum}
-          className={`px-4 py-2 rounded-md ${
-            activeComponent === 'Album' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          Album
-        </button>
-        <button
-          onClick={handleShowMusic}
-          className={`px-4 py-2 rounded-md ${
-            activeComponent === 'Music' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          Music
-        </button>
-      </div>
-      <div className="w-full">
-        {activeComponent === 'Album' && <Album />}
-        {activeComponent === 'Music' && <Music />}
-      </div>
+    <div className="flex space-x-4">
+      <button
+        onClick={onShowAlbum}
+        className={`px-5 py-1 rounded-md ${
+          activeComponent === 'Album' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+        }`}
+      >
+        Album
+      </button>
+      <button
+        onClick={onShowMusic}
+        className={`px-5 py-1 rounded-md ${
+          activeComponent === 'Music' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
+        }`}
+      >
+        Music
+      </button>
     </div>
   );
 };

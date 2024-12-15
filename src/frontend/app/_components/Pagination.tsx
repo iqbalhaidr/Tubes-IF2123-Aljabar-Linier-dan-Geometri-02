@@ -17,30 +17,13 @@ const Pagination: React.FC = () => {
     setMapperItems(mapperData);
   }, []);
 
+  const totalPages = Math.ceil(mapperItems.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = mapperItems.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-  };
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(mapperItems.length / itemsPerPage); i++) {
-      pageNumbers.push(
-        <button
-          key={i}
-          onClick={() => handlePageChange(i)}
-          className={`px-3 py-1 rounded-md ${
-            currentPage === i ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
-          }`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return pageNumbers;
   };
 
   const handlePrevPage = () => {
@@ -50,50 +33,56 @@ const Pagination: React.FC = () => {
   };
 
   const handleNextPage = () => {
-    if (currentPage < Math.ceil(mapperItems.length / itemsPerPage)) {
+    if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
 
   return (
-    <div>
-      <div className="grid grid-cols-3 gap-4">
+    <div className='mt-16'>
+      <div className="grid grid-cols-4 gap-x-8 gap-y-4">
         {currentItems.map((item, index) => (
-          <div key={index} className="flex flex-col items-center mb-4">
-            <div className="w-44 h-24 bg-gray-200 flex items-center justify-center overflow-hidden">
+          <div key={index} className="flex flex-col items-center">
+            <div className="w-44 h-[6.5rem] bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
               <Image
-                src={`/images/${item.pic_name}`} // Fixed the syntax
+                src={`/images/${item.pic_name}`}
                 alt={item.pic_name}
                 width={256}
                 height={256}
                 className="object-contain"
               />
             </div>
-            <p className="mt-2 font-medium">{item.audio_file}</p>
+            <p className="font-medium">{item.audio_file}</p>
           </div>
         ))}
       </div>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center items-center  space-x-4">
         <button
           onClick={handlePrevPage}
-          className={`px-3 py-1 rounded-md ${
-            currentPage === 1 ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-500 text-white'
+          className={`p-2 rounded-md ${
+            currentPage === 1 ? 'text-gray-700 cursor-not-allowed' : 'text-gray-300 hover:text-gray-700 hover:bg-gray-100'
           }`}
           disabled={currentPage === 1}
         >
-          Prev
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
         </button>
-        {renderPageNumbers()}
+        
+        <div className="text-white text-sm">
+          Page {currentPage} of {totalPages}
+        </div>
+        
         <button
           onClick={handleNextPage}
-          className={`px-3 py-1 rounded-md ${
-            currentPage === Math.ceil(mapperItems.length / itemsPerPage)
-              ? 'bg-gray-200 text-gray-700 cursor-not-allowed'
-              : 'bg-blue-500 text-white'
+          className={`p-2 rounded-md ${
+            currentPage === totalPages ? 'text-gray-700 cursor-not-allowed' : 'text-gray-300 hover:text-gray-700 hover:bg-gray-100'
           }`}
-          disabled={currentPage === Math.ceil(mapperItems.length / itemsPerPage)}
+          disabled={currentPage === totalPages}
         >
-          Next
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
         </button>
       </div>
     </div>

@@ -48,24 +48,23 @@ const Album: React.FC = () => {
 
     return (
         <div className="relative h-screen" ref={secondPageRef}>
-            <ToggleComponents />
-            <div className="flex space-y-9 bg-blue-950 h-full">
-                <div className="flex flex-col bg-white w-1/5 my-20 h-auto rounded-lg shadow-lg ">
+            <div className="flex space-y-14 bg-black h-full">
+                <div className="flex flex-col bg-blue-950 w-1/5 mt-14 h-auto shadow-lg ">
                     <div className='py-4 w-full'>
                         <label 
                             htmlFor="pictures-file" 
-                            className='block text-center text-black mb-2'
+                            className='block text-center text-white mb-1'
                         >
                             Pictures File
                         </label>
-                        <div className='flex items-center justify-center space-x-2'>
+                        <div className='flex flex-col items-center justify-center space-x-2'>
                             <input
                                 type="file"
                                 id="pictures-file"
                                 accept=".jpg, .png"
                                 onChange={handlePicturesFileChange}
                                 className="w-full text-sm text-gray-500 
-                                file:mr-2 file:py-2 file:px-4 
+                                file:mr-2 file:py-1 file:px-4 
                                 file:rounded-md file:border-0 
                                 file:text-sm file:font-semibold 
                                 file:bg-blue-50 file:text-blue-700 
@@ -75,14 +74,14 @@ const Album: React.FC = () => {
                                 focus:ring-offset-gray-100" 
                             />
                             <button 
-                                className='px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600'>
+                                className='px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'>
                                 Upload
                             </button>
                         </div>
                     </div>
                     <FileUploader />
                 </div>
-                <div className="mx-auto py-10">
+                <div className="ml-2 justify-center w-full bg-blue-950">
                     <Pagination />
                 </div>
                 
