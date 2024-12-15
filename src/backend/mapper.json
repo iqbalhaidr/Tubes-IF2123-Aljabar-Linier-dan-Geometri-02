@@ -1,62 +1,22 @@
 [
-  {
-    "audio_file": "audio_1.mid",
-    "pic_name": "pic_1.png"
-  },
-  {
-    "audio_file": "audio_2.mid",
-    "pic_name": "pic_2.png"
-  },
-  {
-    "audio_file": "audio_3.mid",
-    "pic_name": "pic_3.png"
-  },
-  {
-    "audio_file": "audio_4.mid",
-    "pic_name": "pic_4.png"
-  },
-  {
-    "audio_file": "audio_5.mid",
-    "pic_name": "pic_5.png"
-  },
-  {
-    "audio_file": "audio_6.mid",
-    "pic_name": "pic_6.png"
-  },
-  {
-    "audio_file": "audio_7.mid",
-    "pic_name": "pic_7.png"
-  },
-  {
-    "audio_file": "audio_8.mid",
-    "pic_name": "pic_8.png"
-  },
-  {
-    "audio_file": "audio_9.mid",
-    "pic_name": "pic_9.png"
-  },
-  {
-    "audio_file": "audio_10.mid",
-    "pic_name": "pic_10.png"
-  },
-  {
-    "audio_file": "audio_11.mid",
-    "pic_name": "pic_11.png"
-  },
-  {
-    "audio_file": "audio_12.mid",
-    "pic_name": "pic_12.png"
-  },
-  {
-    "audio_file": "audio_13.mid",
-    "pic_name": "pic_13.png"
-  },
-  {
-    "audio_file": "audio_14.mid",
-    "pic_name": "pic_14.png"
-  },
-  {
-    "audio_file": "audio_15.mid",
-    "pic_name": "pic_15.png"
-  }
+    {
+        "audio_file": "perfect.mid",
+        "pic_name": "picPerfect.jpg"
+    },
+    {
+        "audio_file": "alone.mid",
+        "pic_name": "picAlone.jpg"
+    },
+    {
+        "audio_file": "rollinginthedeep.mid",
+        "pic_name": "picRollinginthedeep.jpg"
+    },
+    {
+        "audio_file": "faded.mid",
+        "pic_name": "picFaded.jpg"
+    },
+    {
+        "audio_file": "APT.mid",
+        "pic_name": "picAPT.jpg"
+    }
 ]
