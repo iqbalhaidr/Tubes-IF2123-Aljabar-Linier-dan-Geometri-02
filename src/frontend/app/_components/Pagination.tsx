@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import mapperData from '@/app/_components/mapper.json';
+import mapperData from '../../../backend/mapper.json';
 import Image from 'next/image';
 
 interface MapperItem {

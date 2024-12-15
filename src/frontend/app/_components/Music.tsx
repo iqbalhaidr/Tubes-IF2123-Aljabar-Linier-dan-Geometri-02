@@ -19,6 +19,31 @@ const Music: React.FC = () => {
     }
   };
 
+  const handleUploadAudio = async (file: File | null) => {
+    if (!file) return alert('No file selected');
+
+  
+    const formData = new FormData();
+    formData.append('file', file);
+  
+    try {
+      const response = await fetch('http://127.0.0.1:8000/upload_audio/', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message || 'Upload successful!');
+      } else {
+        throw new Error(data.error || 'Upload failed.');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('An error occurred while uploading');
+    }
+  };
+
   return (
     <div className="relative h-screen">
       <div className="flex space-y-14 bg-black h-full">
@@ -29,11 +54,12 @@ const Music: React.FC = () => {
               <input
                 type="file"
                 id="audio-file"
-                accept=".wav"
+                accept=".mid"
                 onChange={handleAudioFileChange}
                 className="w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
               />
-              <button className="px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm">
+              <button className="px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm"
+              onClick={() => handleUploadAudio(audioFile)}>
                 Upload
               </button>
             </div>

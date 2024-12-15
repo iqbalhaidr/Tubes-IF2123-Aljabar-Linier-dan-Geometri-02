@@ -6,6 +6,28 @@ const FileUploader: React.FC = () => {
   const [picturesFile, setPicturesFile] = useState<File | null>(null);
   const [mapperFile, setMapperFile] = useState<File | null>(null);
 
+  const handleUpload = async (file: File | null, type: string) => {
+    if (!file) return alert('No file selected');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('file_type', type);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/upload/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      alert(data.message || data.error || 'Upload successful!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('An error occurred while uploading');
+    }
+  };
+
+
   const handleAudioFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       setAudioFile(event.target.files[0]);
@@ -37,7 +59,7 @@ const FileUploader: React.FC = () => {
           <input
             type="file"
             id="audio-file"
-            accept=".wav .zip"
+            accept=".zip"
             onChange={handleAudioFileChange}
             className="w-full text-sm text-gray-500 
               file:mr-2 file:py-1 file:px-4 
@@ -49,7 +71,8 @@ const FileUploader: React.FC = () => {
               focus:ring-blue-500 focus:ring-offset-2 
               focus:ring-offset-gray-100" 
           />
-          <button 
+          <button
+            onClick={() => handleUpload(audioFile, 'audio')}
             className='px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'
           >
             Upload
@@ -67,7 +90,7 @@ const FileUploader: React.FC = () => {
           <input
             type="file"
             id="pictures-file"
-            accept=".jpg, .png .zip"
+            accept=".zip"
             onChange={handlePicturesFileChange}
             className="w-full text-sm text-gray-500 
               file:mr-2 file:py-1 file:px-4 
@@ -80,6 +103,7 @@ const FileUploader: React.FC = () => {
               focus:ring-offset-gray-100" 
           />
           <button 
+            onClick={() => handleUpload(picturesFile, 'pictures')}
             className='px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'
           >
             Upload
@@ -109,7 +133,8 @@ const FileUploader: React.FC = () => {
               focus:ring-blue-500 focus:ring-offset-2 
               focus:ring-offset-gray-100" 
           />
-          <button 
+          <button
+            onClick={() => handleUpload(mapperFile, 'mapper')}
             className='px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'
           >
             Upload

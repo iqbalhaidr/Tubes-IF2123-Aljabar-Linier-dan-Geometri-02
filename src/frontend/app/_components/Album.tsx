@@ -2,15 +2,13 @@
 import Image from "next/image";
 import Navbar from "@/app/_components/Navbar";
 import Pagination from '@/app/_components/Pagination'; 
-import { useState, useRef } from 'react';
+import { useState, useRef } from 'react'; 
 import FileUploader from "@/app/_components/FileUploader";
 import ToggleComponents from "@/app/_components/ToggleComponents";
 
 const Album: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 3; // Jumlah total halaman
-  const [imageUrl, setImageUrl] = useState<string | null>(null); // State untuk menyimpan URL gambar yang diunggah
-  const [fileName, setFileName] = useState<string | null>(null); // State untuk menyimpan nama file yang diunggah
   const [picturesFile, setPicturesFile] = useState<File | null>(null);
   
   interface PaginationProps {
@@ -31,18 +29,34 @@ const Album: React.FC = () => {
     } 
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
-      setFileName(file.name); // Atur nama file
-    }
-  };
-
   const handlePicturesFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       if (event.target.files) {
         setPicturesFile(event.target.files[0]);
+      }
+    };
+
+    const handleUploadImage = async (file: File | null) => {
+      if (!file) return alert('No file selected');
+
+    
+      const formData = new FormData();
+      formData.append('file', file);
+    
+      try {
+        const response = await fetch('http://127.0.0.1:8000/upload_image/', {
+          method: 'POST',
+          body: formData,
+        });
+    
+        const data = await response.json();
+        if (response.ok) {
+          alert(data.message || 'Upload successful!');
+        } else {
+          throw new Error(data.error || 'Upload failed.');
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('An error occurred while uploading');
       }
     };
 
@@ -74,7 +88,8 @@ const Album: React.FC = () => {
                                 focus:ring-offset-gray-100" 
                             />
                             <button 
-                                className='px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'>
+                                className='px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'
+                                onClick={() => handleUploadImage(picturesFile)}>
                                 Upload
                             </button>
                         </div>
