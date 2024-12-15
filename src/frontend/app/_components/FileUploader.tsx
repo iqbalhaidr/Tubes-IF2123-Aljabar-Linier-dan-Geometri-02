@@ -141,15 +141,6 @@ const FileUploader: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className='py-4 w-full'>
-        <div className='flex flex-col items-center justify-center space-x-2'> 
-          <button 
-            className='px-4 py-1 bg-green-500 text-white rounded-md hover:bg-blue-600 mt-2 text-sm'
-          >
-            Search
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
