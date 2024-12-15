@@ -5,6 +5,8 @@ import Pagination from '@/app/_components/Pagination';
 import { useState, useRef } from 'react'; 
 import FileUploader from "@/app/_components/FileUploader";
 import ToggleComponents from "@/app/_components/ToggleComponents";
+import { Result } from "postcss";
+import ResultPagination from "./ResultPagination";
 
 const Album: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -120,6 +122,7 @@ const Album: React.FC = () => {
                 </div>
                 <div className="ml-2 justify-center w-full bg-blue-950">
                     <Pagination />
+                    {/* <ResultPagination /> */}
                 </div>
                 
             </div>

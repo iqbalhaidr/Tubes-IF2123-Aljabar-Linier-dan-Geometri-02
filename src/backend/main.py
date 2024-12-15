@@ -5,7 +5,7 @@ from zipfile import ZipFile
 from fastapi.middleware.cors import CORSMiddleware
 from process import musicRetrieval, musicRetrievalDataset, ImageRetrieval
 import json
-from mido import MidiFile
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 app.add_middleware(
@@ -16,6 +16,7 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
+app.mount("/datasetimage", StaticFiles(directory="datasetimage"), name="datasetimage")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_AUDIO = os.path.join(BASE_DIR, "datasetaudio")

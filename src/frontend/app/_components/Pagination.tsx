@@ -45,7 +45,7 @@ const Pagination: React.FC = () => {
           <div key={index} className="flex flex-col items-center">
             <div className="w-44 h-[6.5rem] bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
               <Image
-                src={`/images/${item.pic_name}`}
+                src={`http://localhost:8000/datasetimage/${item.pic_name}`}
                 alt={item.pic_name}
                 width={256}
                 height={256}
