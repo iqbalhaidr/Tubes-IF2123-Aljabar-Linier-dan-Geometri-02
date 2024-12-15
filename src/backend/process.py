@@ -14,11 +14,8 @@ def loadMidi(filePath):
     print("midifile")
     midi = MidiFile(filePath)
     print(midi)
-    dataIdx = findTrackChannel(filePath)
+    trackIdx, channelIdx = find_melody_track_and_channel_with_scoring(filePath)
     print("done dataidx")
-    trackIdx = dataIdx['track']
-    channelIdx = dataIdx['channel']
-    
     track = midi.tracks[trackIdx]
     pesan = []
     absoluteTime = 0
@@ -227,7 +224,7 @@ def computeSimilarity(querySong, datasetSong):
     simFTB = sum(windowsSimFTB) / len(windowsSimFTB)
 
     # Rumus pembobotan yang optimal setelah dilakukan eksperimen
-    sim = simATB*0.05 + simRTB*0.55 + simFTB*0.40
+    sim = simATB*0.05 + simRTB*0.475 + simFTB*0.475
 
     return sim
 
@@ -293,61 +290,99 @@ def loadDataset(datasetPath):
     
     return convertedDataset
 
+# Fungsi pembantu mencari track dan channel melodi utama
+def calculate_note_density(filtered_msgs):
+    current_time = 0
+    active_notes = 0
+    active_time = 0
+    total_time = 0
+
+    messages = []
+    for msg in filtered_msgs:
+        current_time += msg.time
+        messages.append((current_time, msg))
+
+    messages.sort(key=lambda x: x[0])
+
+    last_time = 0
+    for timestamp, msg in messages:
+        delta_time = timestamp - last_time
+        if active_notes > 0:
+            active_time += delta_time
+        total_time += delta_time
+
+        if msg.type == 'note_on' and msg.velocity > 0:
+            active_notes += 1
+        elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
+            active_notes = max(active_notes - 1, 0)
+
+        last_time = timestamp
+
+    if total_time == 0:
+        return 0
+    return active_time / total_time
+
 # { Prekondisi: filePath terdefinisi }
-# { Mengembalikan dict berisi data track, channel melodi utama }
-def findTrackChannel(filePath):
-    print("findtrack")
-    midi = MidiFile(filePath)
-    trackInfo = []
+# { Mengembalikan data track, channel melodi utama }
+def find_melody_track_and_channel_with_scoring(file_path, weights=None):
+    midi = MidiFile(file_path)
 
-    for i, track in enumerate(midi.tracks):
-        channelInfo = {}
-        notes = []
+    track_channel_info = {}
 
+    if weights is None:
+        weights = {
+            'note_density': 0.20,
+            'highest_note': 0.80,
+            'note_on_count': 0.0  # Opsional
+        }
+
+    for track_idx, track in enumerate(midi.tracks):
+        track_channel_info[track_idx] = {}
         for msg in track:
-            if msg.type == 'note_on' and msg.velocity > 0:
-                notes.append({
-                    'channel': msg.channel,
-                    'pitch': msg.note,
-                    'velocity': msg.velocity
-                })
+            if msg.type in ['note_on', 'note_off'] and hasattr(msg, 'channel'):
+                channel = msg.channel
+                if channel not in track_channel_info[track_idx]:
+                    track_channel_info[track_idx][channel] = {
+                        'highest_note': -1,
+                        'note_density': 0.0,
+                        'note_on_count': 0
+                    }
 
-        channels = {}
-        for note in notes:
-            ch = note['channel']
-            if ch not in channels:
-                channels[ch] = {
-                    'notes': []
-                }
-            channels[ch]['notes'].append(note)
+                if msg.type == 'note_on' and msg.velocity > 0:
+                    if msg.note > track_channel_info[track_idx][channel]['highest_note']:
+                        track_channel_info[track_idx][channel]['highest_note'] = msg.note
+                    track_channel_info[track_idx][channel]['note_on_count'] += 1
 
-        for ch, info in channels.items():
-            pitches = [n['pitch'] for n in info['notes']]
-            if not pitches:
-                continue
-            pitchRange = max(pitches) - min(pitches)
-            totalNotes = len(pitches)
-            avgVelocity = sum(n['velocity'] for n in info['notes']) / totalNotes
+    for track_idx, track in enumerate(midi.tracks):
+        for channel_idx in track_channel_info[track_idx]:
+            filtered_msgs = [
+                msg for msg in track 
+                if hasattr(msg, 'channel') and msg.channel == channel_idx and msg.type in ['note_on', 'note_off']
+            ]
+            density = calculate_note_density(filtered_msgs)
+            track_channel_info[track_idx][channel_idx]['note_density'] = density
 
-            # Pen-skor-an sederhana
-            score = pitchRange + totalNotes * 0.1 + avgVelocity * 0.01
+    melody_track = None
+    melody_channel = None
+    max_score = -1
 
-            trackInfo.append({
-                'track': i,
-                'channel': ch,
-                'score': score
-            })
+    for track_idx, channels in track_channel_info.items():
+        for channel_idx, info in channels.items():
+            score = 0.0
+            score += weights.get('note_density', 0) * info['note_density']
+            score += weights.get('highest_note', 0) * (info['highest_note'] / 127)
+            score += weights.get('note_on_count', 0) * (info['note_on_count'] / max(info['note_on_count'] for c in channels.values()))
 
-    # Filter hanya channel 0 dan track terdefinisi
-    filteredInfo = [info for info in trackInfo if info['channel'] == 0 and info['track'] is not None]
+            if score > max_score:
+                max_score = score
+                melody_track = track_idx
+                melody_channel = channel_idx
 
-    # Jika kosong kembalikan track, channel manapun dengan skor tertinggi
-    if not filteredInfo:
-        return max(trackInfo, key=lambda x: x['score'])
-
-    # Pilih track, channel skor tertinggi setelah difilter
-    mainMelody = max(filteredInfo, key=lambda x: x['score'])
-    return mainMelody
+    if melody_track is not None and melody_channel is not None:
+        return melody_track, melody_channel
+    else:
+        print("Unable to find main melody track and channel.")
+        return None, None
 
 # { I.S. folderPath terdefinisi berisi .mid
 #   F.S. Mengekstraksi fitur dari setiap file.mid pada folderPath
