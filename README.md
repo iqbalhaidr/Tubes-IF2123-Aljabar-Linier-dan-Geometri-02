@@ -4,7 +4,7 @@ Song Tuah merupakan website yang dapat digunakan untuk mencari kemiripan dari fi
 
 ## Installing / Getting started
 
-Program ini bisa dijalankan pada python versi 3.10 ke atas.
+Program ini bisa dijalankan pada python versi 3.10-3.12.
 
 1. Setup virtual environment dengan menjalankan command berikut di terminal:
    `python -m venv venv`
