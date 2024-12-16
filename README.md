@@ -1,7 +1,3 @@
-# Algeo02-23025
-Tugas Besar Algeo 2
-
-
 # Song Tuah
 
 Song Tuah merupakan website yang dapat digunakan untuk mencari kemiripan dari file audio atauapun gambar terhadap sebuah dataset album. Program ini akan mencari kemiripan dari gambar yang diberikan dengan gambar suatu album atau kemiripan suara dari audio yang diberikan dengan lagu dari album yang ada.
