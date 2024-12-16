@@ -424,7 +424,7 @@ def musicRetrieval(folderPath, filePath, resultPath):
     result = []
     i = 0
     for info in prediction:
-        if (info['sim'] > 90):
+        if (info['sim'] > 70):
             print(f"{i+1}. {info['name']} {info['sim']}%")
             result.append(info)
             i += 1
@@ -460,7 +460,7 @@ def musicRetrievalDataset(datasetPath, filePath, resultPath):
     result = []
     i = 0
     for info in prediction:
-        if (info['sim'] > 90):
+        if (info['sim'] > 70):
             print(f"{i+1}. {info['name']} {info['sim']}%")
             result.append(info)
             i += 1
@@ -595,7 +595,7 @@ def ImageRetrieval(folder_path, filePath, resultPath, target_size=(100, 100), to
 
     for idx, sim in similar_images:
         sim = float(sim)
-        if sim > 90:
+        if sim > 70:
             file_name = os.path.basename(dataset_paths[idx]) 
             result.append({
                 "file": file_name,

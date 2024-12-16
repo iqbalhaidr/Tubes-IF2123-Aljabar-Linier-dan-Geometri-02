@@ -113,7 +113,7 @@ const ResultAlbum: React.FC = () => {
   return (
     <div className="mt-16">
       {/* Render current items in grid */}
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-4 grid-rows-2">
         {currentItems.map((item, index) => (
           <div key={index} className="flex flex-col items-center p-4 rounded-md">
             <div className="w-44 h-[6.5rem] bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
@@ -126,7 +126,7 @@ const ResultAlbum: React.FC = () => {
               />
             </div>
             <p className="font-medium text-m mt-2">{item.audio_file}</p>
-            <p className="text-white text-m">Similarity: {item.sim.toFixed(2)}</p>
+            <p className="text-white text-m">Similarity: {item.sim.toFixed(2)}%</p>
           </div>
         ))}
       </div>

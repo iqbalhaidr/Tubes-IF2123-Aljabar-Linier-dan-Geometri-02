@@ -126,7 +126,7 @@ const ResultMusic: React.FC = () => {
               />
             </div>
             <p className="font-medium text-m mt-2">{item.audio_file}</p>
-            <p className="text-white text-m">Similarity: {item.sim.toFixed(2)}</p>
+            <p className="text-white text-m">Similarity: {item.sim.toFixed(2)}%</p>
           </div>
         ))}
       </div>

@@ -149,8 +149,18 @@ async def upload_image(file: UploadFile = File(...)):
 @app.post("/search_image/")
 async def search_image():
     try:
+        if not os.path.exists(QUERY_IMAGE):
+            return {"message": "Cannot search, file does not exist."}
         print("Proceeding with Image Retrieval...")
         ImageRetrieval(DATASET_IMAGE,QUERY_IMAGE,RESULT_PATH)
+
+        if os.path.exists(QUERY_IMAGE):
+            os.remove(QUERY_IMAGE)
+            print(f"File {QUERY_IMAGE} has been removed.")
+        else:
+            print(f"File {QUERY_IMAGE} not found, nothing to remove.")
+        
+        return {"message": "Search Image successfully"}
     except Exception as e:
         print("Gagal lagi")
         return{"error": str(e)}
@@ -158,6 +168,9 @@ async def search_image():
 @app.post("/search_audio/")
 async def search_audio():
     try:
+        if not os.path.exists(QUERY_AUDIO):
+            return {"error": f"Cannot search, file does not exist."}
+
         print(f"Checking if {DB_AUDIO} is empty...")
         if is_json_empty(DB_AUDIO):
             print(f"{DB_AUDIO} is empty. Proceeding with musicRetrieval...")
@@ -165,6 +178,14 @@ async def search_audio():
         else:
             print(f"{DB_AUDIO} exists. Proceeding with musicRetrievalDataset...")
             musicRetrievalDataset(DB_AUDIO,QUERY_AUDIO,RESULT_PATH)
+        
+        if os.path.exists(QUERY_AUDIO):
+            os.remove(QUERY_AUDIO)
+            print(f"File {QUERY_AUDIO} has been removed.")
+        else:
+            print(f"File {QUERY_AUDIO} not found, nothing to remove.")
+        
+        return {"message": "Search Audio successfully"}
         return {"message": "Search Audio successfully"}
     except Exception as e:
         print("Gagal jir")
