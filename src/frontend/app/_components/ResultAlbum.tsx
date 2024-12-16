@@ -24,7 +24,7 @@ interface ExecutionItem {
   execution: number;
 }
 
-const ResultPagination: React.FC = () => {
+const ResultAlbum: React.FC = () => {
   const [mapperItems, setMapperItems] = useState<CombinedItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
@@ -176,4 +176,4 @@ const ResultPagination: React.FC = () => {
   );
 };
 
-export default ResultPagination;
+export default ResultAlbum;
