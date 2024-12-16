@@ -4,6 +4,8 @@ from mido import MidiFile
 import json
 import os
 import time
+import librosa
+import pretty_midi
 
 # ========================= MUSIC INFORMATION RETRIEVAL ======================
 
@@ -167,6 +169,8 @@ def extractFile(filePath):
 # { Mengembalikan list of dict <nama, fiturATB, fiturRTB, fiturFTB> sebuah 
 #   file/lagu }
 def extractFolder(folderPath):
+    folderToMidi(folderPath)
+    
     midiFiles = []
     print("Cek midi say")
     for fileName in os.listdir(folderPath):
@@ -384,6 +388,63 @@ def find_melody_track_and_channel_with_scoring(file_path, weights=None):
         print("Unable to find main melody track and channel.")
         return None, None
 
+# Fungsi untuk mengubah file .wav ke .mid
+def wav_to_midi(wav_path, midi_path, sr=22050, hop_length=512, fmin=librosa.note_to_hz('C2'), fmax=librosa.note_to_hz('C7')):
+    y, sr = librosa.load(wav_path, sr=sr)
+
+    pitches, magnitudes = librosa.piptrack(y=y, sr=sr, hop_length=hop_length, fmin=fmin, fmax=fmax)
+
+    midi = pretty_midi.PrettyMIDI()
+    piano_program = pretty_midi.instrument_name_to_program('Acoustic Grand Piano')
+    piano = pretty_midi.Instrument(program=piano_program)
+
+    prev_pitch = None
+    note_start = 0
+    current_time = 0
+    for i in range(pitches.shape[1]):
+        index = magnitudes[:, i].argmax()
+        pitch = pitches[index, i]
+        if pitch > 0:
+            note = librosa.hz_to_midi(pitch)
+            note = int(round(note))
+            if prev_pitch is None:
+                # Memulai not baru
+                note_start = librosa.frames_to_time(i, sr=sr, hop_length=hop_length)
+                prev_pitch = note
+            elif note != prev_pitch:
+                # Menutup not sebelumnya dan memulai not baru
+                note_end = librosa.frames_to_time(i, sr=sr, hop_length=hop_length)
+                piano.notes.append(pretty_midi.Note(
+                    velocity=100, pitch=prev_pitch, start=note_start, end=note_end))
+                note_start = librosa.frames_to_time(i, sr=sr, hop_length=hop_length)
+                prev_pitch = note
+        else:
+            if prev_pitch is not None:
+                # Menutup not sebelumnya
+                note_end = librosa.frames_to_time(i, sr=sr, hop_length=hop_length)
+                piano.notes.append(pretty_midi.Note(
+                    velocity=100, pitch=prev_pitch, start=note_start, end=note_end))
+                prev_pitch = None
+
+    if prev_pitch is not None:
+        note_end = librosa.frames_to_time(pitches.shape[1], sr=sr, hop_length=hop_length)
+        piano.notes.append(pretty_midi.Note(
+            velocity=100, pitch=prev_pitch, start=note_start, end=note_end))
+
+    midi.instruments.append(piano)
+
+    midi.write(midi_path)
+    #print(f"File MIDI telah disimpan di {midi_path}")
+
+# Fungsi mengubah semua file .wav dalam folder menjadi .mid
+def folderToMidi(folderPath):
+    for fileName in os.listdir(folderPath):
+        if fileName.endswith(".wav"):
+            input_path = folderPath + fileName
+            output_path = folderPath + os.path.splitext(fileName)[0] + ".mid"
+            wav_to_midi(input_path, output_path)
+
+
 # { I.S. folderPath terdefinisi berisi .mid
 #   F.S. Mengekstraksi fitur dari setiap file.mid pada folderPath
 #        lalu menyimpannya di datasetPath dalam bentuk .json}
@@ -409,6 +470,10 @@ def musicRetrieval(folderPath, filePath, resultPath):
     extractTime = round(extractTime, 2)
 
     print("Mulai extract file")
+    if filePath.endswith(".wav"):
+        output_path = os.path.splitext(filePath)[0] + ".mid"
+        wav_to_midi(filePath, output_path)
+        filePath = output_path
     song = extractFile(filePath)
 
     print("Mulai prediksi")
@@ -447,6 +512,10 @@ def musicRetrievalDataset(datasetPath, filePath, resultPath):
     loadTime = (end-start) * 10**3
     loadTime = round(loadTime, 2)
 
+    if filePath.endswith(".wav"):
+        output_path = os.path.splitext(filePath)[0] + ".mid"
+        wav_to_midi(filePath, output_path)
+        filePath = output_path
     song = extractFile(filePath)
 
     start = time.time()
