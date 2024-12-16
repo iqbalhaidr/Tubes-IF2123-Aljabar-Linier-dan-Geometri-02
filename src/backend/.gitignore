@@ -1,0 +1,8 @@
+__pycache__/
+datasetaudio/
+datasetimage/
+dbaudio.json
+result.json
+query_image.png
+query_audio.mid
+mapper.json

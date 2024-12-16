@@ -7,6 +7,7 @@ from process import musicRetrieval, musicRetrievalDataset, ImageRetrieval
 import json
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+import rarfile
 
 app = FastAPI()
 app.add_middleware(
@@ -206,48 +207,66 @@ async def upload_image(file: UploadFile = File(...)):
     except Exception as e:
         return{"error": str(e)}
 
+import os
+import shutil
+from fastapi import UploadFile, File, Form
+from zipfile import ZipFile
+import rarfile
+
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...), file_type: str = Form(...)):
     try:
-        if file_type == "audio":
-            for file_name in os.listdir(DATASET_AUDIO):
-                file_path = os.path.join(DATASET_AUDIO, file_name)
+        def clear_existing_files(folder_path):
+            for file_name in os.listdir(folder_path):
+                file_path = os.path.join(folder_path, file_name)
                 if os.path.isfile(file_path):
                     os.remove(file_path)
-            
+
+        if file_type == "audio":
+            clear_existing_files(DATASET_AUDIO)
+
             file_location = os.path.join(BASE_DIR, file.filename)
             with open(file_location, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
-            
-            with ZipFile(file_location, 'r') as zip_ref:
-                zip_ref.extractall(DATASET_AUDIO)
-            
-            os.remove(file_location)  # Clean up the uploaded ZIP file
-            return {"message": "Audio ZIP extracted successfully"}
+
+            if file.filename.endswith('.zip'):
+                with ZipFile(file_location, 'r') as zip_ref:
+                    zip_ref.extractall(DATASET_AUDIO)
+            elif file.filename.endswith('.rar'):
+                with rarfile.RarFile(file_location, 'r') as rar_ref:
+                    rar_ref.extractall(DATASET_AUDIO)
+            else:
+                return {"error": "Unsupported file format. Please upload a zip or rar file."}
+
+            os.remove(file_location)  # Clean up the uploaded ZIP/RAR file
+            return {"message": "Audio file extracted successfully"}
 
         elif file_type == "pictures":
-            for file_name in os.listdir(DATASET_IMAGE):
-                file_path = os.path.join(DATASET_IMAGE, file_name)
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
+            clear_existing_files(DATASET_IMAGE)
 
             file_location = os.path.join(BASE_DIR, file.filename)
             with open(file_location, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
-            
-            with ZipFile(file_location, 'r') as zip_ref:
-                zip_ref.extractall(DATASET_IMAGE)
-            
-            os.remove(file_location)  # Clean up the uploaded ZIP file
-            return {"message": "Pictures ZIP extracted successfully"}
+
+            if file.filename.endswith('.zip'):
+                with ZipFile(file_location, 'r') as zip_ref:
+                    zip_ref.extractall(DATASET_IMAGE)
+            elif file.filename.endswith('.rar'):
+                with rarfile.RarFile(file_location, 'r') as rar_ref:
+                    rar_ref.extractall(DATASET_IMAGE)
+            else:
+                return {"error": "Unsupported file format. Please upload a zip or rar file."}
+
+            os.remove(file_location)  # Clean up the uploaded ZIP/RAR file
+            return {"message": "Pictures file extracted successfully"}
 
         elif file_type == "mapper":
-            # Write JSON content to mapper.json
             with open(MAPPER_FILE, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
             return {"message": "Mapper file uploaded successfully"}
 
         else:
             return {"error": "Invalid file type"}
+
     except Exception as e:
         return {"error": str(e)}
