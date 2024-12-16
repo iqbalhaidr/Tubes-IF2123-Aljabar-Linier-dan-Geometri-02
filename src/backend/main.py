@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from process import musicRetrieval, musicRetrievalDataset, ImageRetrieval
 import json
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 app.add_middleware(
@@ -50,6 +51,85 @@ def is_json_empty(file_path):
             raise json.JSONDecodeError(f"Invalid JSON in file {file_path}")
 
 
+@app.get("/result")
+async def get_result():
+    try:
+        # Open and read the result.json file
+        with open(RESULT_PATH, "r") as f:
+            result_data = json.load(f)
+        return JSONResponse(content=result_data)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.get("/mapper")
+async def get_mapper():
+    try:
+        # Open and read the mapper.json file
+        with open(MAPPER_FILE, "r") as f:
+            mapper_data = json.load(f)
+        return JSONResponse(content=mapper_data)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.get("/combined_image")
+async def get_combined_data():
+    try:
+        # Load result.json data
+        with open(RESULT_PATH, "r") as f:
+            result_data = json.load(f)
+
+        # Load mapper.json data
+        with open(MAPPER_FILE, "r") as f:
+            mapper_data = json.load(f)
+
+        combined_data = []
+        
+        # Combine logic (just an example)
+        for result_item in result_data[:-1]:  # Exclude the last item (execution time)
+            matched_mapper = next((mapper for mapper in mapper_data if mapper["pic_name"] == result_item["file"]), None)
+            if matched_mapper:
+                combined_item = {
+                    "audio_file": matched_mapper["audio_file"],
+                    "pic_name": result_item["file"],
+                    "sim": result_item["sim"]
+                }
+                combined_data.append(combined_item)
+
+        execution_time = result_data[-1]["execution"] if result_data else None
+        
+        return JSONResponse(content={"data": combined_data, "execution_time": execution_time})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+    
+@app.get("/combined_audio")
+async def get_combined_data():
+    try:
+        # Load result.json data
+        with open(RESULT_PATH, "r") as f:
+            result_data = json.load(f)
+
+        # Load mapper.json data
+        with open(MAPPER_FILE, "r") as f:
+            mapper_data = json.load(f)
+
+        combined_data = []
+        
+        # Combine logic (just an example)
+        for result_item in result_data[:-1]:  # Exclude the last item (execution time)
+            matched_mapper = next((mapper for mapper in mapper_data if mapper["audio_file"] == result_item["name"]), None)
+            if matched_mapper:
+                combined_item = {
+                    "audio_file": result_item["name"],
+                    "pic_name": matched_mapper["pic_name"],
+                    "sim": result_item["sim"]
+                }
+                combined_data.append(combined_item)
+
+        execution_time = result_data[-1]["execution"] if result_data else None
+        
+        return JSONResponse(content={"data": combined_data, "execution_time": execution_time})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 @app.post("/upload_image/")
 async def upload_image(file: UploadFile = File(...)):
@@ -101,7 +181,7 @@ async def upload_image(file: UploadFile = File(...)):
         with open(file_location, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        return {"message": "Image Uploaded successfully"}
+        return {"message": "Audio Uploaded successfully"}
     except Exception as e:
         return{"error": str(e)}
 

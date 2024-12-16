@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import FileUploader from "@/app/_components/FileUploader";
 import Pagination from "@/app/_components/Pagination";
-import ResultPagination from "@/app/_components/ResultPagination";
+import ResultMusic from "@/app/_components/ResultMusic";
 
 const Music: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,6 +53,7 @@ const Music: React.FC = () => {
       const data = await response.json();
       if (response.ok) {
         alert(data.message || 'Upload successful!');
+        setUseResultPagination(false);
       } else {
         throw new Error(data.error || 'Upload failed.');
       }
@@ -96,7 +97,7 @@ const Music: React.FC = () => {
         </div>
 
         <div className="ml-2 justify-center w-full bg-blue-950">
-          {useResultPagination ? <ResultPagination /> : <Pagination />}
+          {useResultPagination ? <ResultMusic /> : <Pagination />}
         </div>
       </div>
     </div>

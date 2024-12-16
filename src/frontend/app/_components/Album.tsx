@@ -4,7 +4,7 @@ import Navbar from "@/app/_components/Navbar";
 import Pagination from '@/app/_components/Pagination'; 
 import { useState, useRef } from 'react'; 
 import FileUploader from "@/app/_components/FileUploader";
-import ResultPagination from "@/app/_components/ResultPagination";
+import ResultAlbum from "@/app/_components/ResultAlbum";
 
 const Album: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,6 +62,7 @@ const Album: React.FC = () => {
       const data = await response.json();
       if (response.ok) {
         alert(data.message || 'Upload successful!');
+        setUseResultPagination(false);
       } else {
         throw new Error(data.error || 'Upload failed.');
       }
@@ -119,7 +120,7 @@ const Album: React.FC = () => {
           </div>
         </div>
         <div className="ml-2 justify-center w-full bg-blue-950">
-          {useResultPagination ? <ResultPagination /> : <Pagination />}
+          {useResultPagination ? <ResultAlbum /> : <Pagination />}
         </div>
       </div>
     </div>
