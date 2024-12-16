@@ -37,6 +37,11 @@ pip install librosa
 cd src/frontend
 ```
 
+6. Install concurrently
+```shell
+npm install -D concurrently
+```
+
 7. Run program dengan menjalankan command berikut di terminal:
  ```shell
 npm run dev
