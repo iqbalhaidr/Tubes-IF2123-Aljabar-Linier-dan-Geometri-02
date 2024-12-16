@@ -35,9 +35,9 @@ const ResultPagination: React.FC = () => {
     const combinedData: CombinedItem[] = [];
     for (let i = 0; i < resultData.length - 1; i++) {
       const resultItem = resultData[i] as ResultItem;
-      const mapperItem = mapperData.find((item: MapperItem) => item.audio_file === resultItem.name);
+      const mapperItem = mapperData.find((item: MapperItem) => item.audio_file == resultItem.name);
       combinedData.push({
-        audio_file: resultItem.name,
+        audio_file: mapperItem ? mapperItem.audio_file : '',
         pic_name: mapperItem ? mapperItem.pic_name : '',
         sim: resultItem.sim,
       });
