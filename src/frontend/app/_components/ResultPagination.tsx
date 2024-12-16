@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 // Define the types for resultData and mapperData
 interface ResultItem {
-  name: string;
+  file: string;
   sim: number;
 }
 
@@ -31,25 +31,44 @@ const ResultPagination: React.FC = () => {
   const itemsPerPage = 8;
 
   useEffect(() => {
-    console.log('Raw resultData:', resultData); // Log the raw result.json
-    console.log('Raw mapperData:', mapperData); // Log mapper.json
-    // Combine data from result.json and mapper.json
-    const combinedData: CombinedItem[] = [];
-    for (let i = 0; i < resultData.length - 1; i++) {
-      const resultItem = resultData[i] as ResultItem;
-      const mapperItem = mapperData.find((item: MapperItem) => item.audio_file == resultItem.name);
-      combinedData.push({
-        audio_file: mapperItem ? mapperItem.audio_file : '',
-        pic_name: mapperItem ? mapperItem.pic_name : '',
-        sim: resultItem.sim,
-      });
-      console.log('Combined data:', combinedData); // Log the combined data
-    }
+    // Fetch the JSON data from your FastAPI backend
+    const fetchData = async () => {
+      try {
+        // Fetch the result and mapper data
+        const resultResponse = await fetch('http://127.0.0.1:8000/result');
+        const mapperResponse = await fetch('http://127.0.0.1:8000/mapper');
 
-    // Extract the last element as the execution time
-    const executionTime = resultData[resultData.length - 1] as ExecutionItem;
-    setExecutionTime(executionTime.execution);
-    setMapperItems(combinedData);
+        const resultData: ResultItem[] = await resultResponse.json();
+        const mapperData: MapperItem[] = await mapperResponse.json();
+
+        // Combine data from result.json and mapper.json
+        const combinedData: CombinedItem[] = resultData
+          .slice(0, -1) // Exclude the last item (execution time)
+          .map((resultItem: ResultItem) => {
+            const matchedMapper = mapperData.find(
+              (mapperItem: MapperItem) => mapperItem.pic_name === resultItem.file
+            );
+
+            return matchedMapper 
+              ? {
+                  audio_file: matchedMapper.audio_file,
+                  pic_name: resultItem.file,
+                  sim: resultItem.sim,
+                }
+              : null;
+          })
+          .filter((item): item is CombinedItem => item !== null);
+
+        // Extract the last element as the execution time
+        const executionTime = resultData[resultData.length - 1] as ExecutionItem;
+        setExecutionTime(executionTime.execution);
+        setMapperItems(combinedData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const totalPages = Math.ceil(mapperItems.length / itemsPerPage);
