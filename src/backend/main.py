@@ -3,7 +3,7 @@ import shutil
 import os
 from zipfile import ZipFile
 from fastapi.middleware.cors import CORSMiddleware
-from process import musicRetrieval, musicRetrievalDataset, ImageRetrieval
+from process import musicRetrieval, musicRetrievalDataset, ImageRetrieval, wav_to_midi
 import json
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
@@ -169,16 +169,28 @@ async def search_image():
 @app.post("/search_audio/")
 async def search_audio():
     try:
+        for file_name in os.listdir(DATASET_AUDIO):
+            file_path = os.path.join(DATASET_AUDIO, file_name)
+            if file_name.endswith(".wav"):
+                midi_output_path = os.path.join(DATASET_AUDIO, file_name.replace(".wav", ".mid"))
+                print(f"Converting {file_name} to MIDI...")
+                wav_to_midi(file_path, midi_output_path)
+                print(f"{file_name} converted to MIDI at {midi_output_path}")
+                
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    print(f"Removed original WAV file: {file_path}")
+        
         if not os.path.exists(QUERY_AUDIO):
-            return {"error": f"Cannot search, file does not exist."}
+            return {"error": "Cannot search, file does not exist."}
 
         print(f"Checking if {DB_AUDIO} is empty...")
         if is_json_empty(DB_AUDIO):
             print(f"{DB_AUDIO} is empty. Proceeding with musicRetrieval...")
-            musicRetrieval(DATASET_AUDIO,QUERY_AUDIO,RESULT_PATH)
+            musicRetrieval(DATASET_AUDIO, QUERY_AUDIO, RESULT_PATH)
         else:
             print(f"{DB_AUDIO} exists. Proceeding with musicRetrievalDataset...")
-            musicRetrievalDataset(DB_AUDIO,QUERY_AUDIO,RESULT_PATH)
+            musicRetrievalDataset(DB_AUDIO, QUERY_AUDIO, RESULT_PATH)
         
         if os.path.exists(QUERY_AUDIO):
             os.remove(QUERY_AUDIO)
@@ -187,7 +199,6 @@ async def search_audio():
             print(f"File {QUERY_AUDIO} not found, nothing to remove.")
         
         return {"message": "Search Audio successfully"}
-        return {"message": "Search Audio successfully"}
     except Exception as e:
         print("Gagal jir")
         return{"error": str(e)}
@@ -195,15 +206,30 @@ async def search_audio():
 @app.post("/upload_audio/")
 async def upload_image(file: UploadFile = File(...)):
     try:
+        file_extension = os.path.splitext(file.filename)[1].lower()
+
         file_location = os.path.join(BASE_DIR, "query_audio.mid")
+        temp_wav_path = os.path.join(BASE_DIR, "temp_audio.wav")
 
         if os.path.exists(file_location):
             os.remove(file_location)
 
-        with open(file_location, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        return {"message": "Audio Uploaded successfully"}
+        if file_extension == ".wav":
+            with open(temp_wav_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+
+            wav_to_midi(temp_wav_path, file_location)
+            if os.path.exists(temp_wav_path):
+                os.remove(temp_wav_path)
+
+        elif file_extension == ".mid":
+            # Save the MIDI file directly
+            with open(file_location, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+        else:
+            return {"error": "Unsupported file format. Only .wav and .mid are allowed."}
+
+        return {"message": "Audio uploaded successfully"}
     except Exception as e:
         return{"error": str(e)}
 

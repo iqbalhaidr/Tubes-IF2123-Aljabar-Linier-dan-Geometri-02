@@ -87,7 +87,7 @@ const Album: React.FC = () => {
               <input
                 type="file"
                 id="pictures-file"
-                accept=".jpg, .png"
+                accept=".jpg, .png, .jpeg"
                 onChange={handlePicturesFileChange}
                 className="w-full text-sm text-gray-500 
                   file:mr-2 file:py-1 file:px-4 
