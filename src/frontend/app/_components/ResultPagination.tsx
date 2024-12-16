@@ -31,6 +31,8 @@ const ResultPagination: React.FC = () => {
   const itemsPerPage = 8;
 
   useEffect(() => {
+    console.log('Raw resultData:', resultData); // Log the raw result.json
+    console.log('Raw mapperData:', mapperData); // Log mapper.json
     // Combine data from result.json and mapper.json
     const combinedData: CombinedItem[] = [];
     for (let i = 0; i < resultData.length - 1; i++) {
@@ -41,6 +43,7 @@ const ResultPagination: React.FC = () => {
         pic_name: mapperItem ? mapperItem.pic_name : '',
         sim: resultItem.sim,
       });
+      console.log('Combined data:', combinedData); // Log the combined data
     }
 
     // Extract the last element as the execution time
