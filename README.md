@@ -13,7 +13,7 @@ python -m venv venv
 
 2. Aktifkan virtual environment dengan menjalankan command berikut di terminal:
 
-   - MacOS / Linux :
+- MacOS / Linux :
 ```shell
 source venv/bin/activate
 ```
