@@ -73,7 +73,7 @@ const Music: React.FC = () => {
               <input
                 type="file"
                 id="audio-file"
-                accept=".mid"
+                accept=".mid, .wav"
                 onChange={handleAudioFileChange}
                 className="w-full text-sm text-gray-500 file:mr-2 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
               />
