@@ -7,26 +7,40 @@ Song Tuah merupakan website yang dapat digunakan untuk mencari kemiripan dari fi
 Program ini bisa dijalankan pada python versi 3.10-3.12.
 
 1. Setup virtual environment dengan menjalankan command berikut di terminal:
-   `python -m venv venv`
+```shell
+python -m venv venv
+```
 
 2. Aktifkan virtual environment dengan menjalankan command berikut di terminal:
 
    - MacOS / Linux :
-     `source venv/bin/activate`
+```shell
+source venv/bin/activate
+```
    - Windows :
-     `venv\Scripts\activate`
+```shell
+venv\Scripts\activate
+```
 
 3. Install semua library yang diperlukan dengan menjalankan command berikut di terminal:
-   `pip install -r requirements.txt`
+```shell
+pip install -r requirements.txt
+```
 
 4. Install librosa:
-   `pip intall librosa`
+```shell
+pip install librosa
+```
 
 5. Ubah directory
-   `cd src/frontend`
+```shell
+cd src/frontend
+```
 
 7. Run program dengan menjalankan command berikut di terminal:
-   `npm run dev`
+ ```shell
+npm run dev
+```
 
 Terminal akan memberi link yaitu `localhost:3000` yang merupakan link website yang ingin dipakai. 
 
