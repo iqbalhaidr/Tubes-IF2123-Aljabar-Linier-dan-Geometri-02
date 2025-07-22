@@ -1,4 +1,4 @@
-# Song Tuah
+# Tugas Besar 2 IF2123 Aljabar Linier dan Geometri 2024/2025
 
 Song Tuah merupakan website yang dapat digunakan untuk mencari kemiripan dari file audio atauapun gambar terhadap sebuah dataset album. Program ini akan mencari kemiripan dari gambar yang diberikan dengan gambar suatu album atau kemiripan suara dari audio yang diberikan dengan lagu dari album yang ada.
 
